@@ -1,0 +1,130 @@
+version: '2'
+
+services:
+
+  proxy:
+    image: jwilder/nginx-proxy
+    container_name: proxy
+    restart: unless-stopped
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - ./uploadsize.conf:/etc/nginx/conf.d/uploadsize.conf:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - "default"
+      - "proxy-tier"
+
+  proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    restart: unless-stopped
+    environment:
+      - NGINX_PROXY_CONTAINER=proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - "proxy"
+    depends_on:
+      - "proxy"
+    networks:
+      - "default"
+      - "proxy-tier"
+
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    restart: always
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+    environment:
+      - VIRTUAL_HOST=docker.rgsc.top
+      - LETSENCRYPT_HOST=docker.rgsc.top
+      - LETSENCRYPT_EMAIL=xuyiqun.xyq@gmail.com
+      - VIRTUAL_PORT=9000
+    volumes:
+      - ./portainer/:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "9000:9000"
+
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      - VIRTUAL_HOST=git.rgsc.top
+      - LETSENCRYPT_HOST=git.rgsc.top
+      - LETSENCRYPT_EMAIL=xuyiqun.xyq@gmail.com
+      - USER_UID=1000
+      - USER_GID=1000
+      - ROOT_URL=https://git.rgsc.top
+      - DOMAIN=git.rgsc.top
+      - PROTOCOL=http
+      - VIRTUAL_PORT=3000
+    restart: unless-stopped
+    networks:
+      - "proxy-tier"
+      - "default"
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+    volumes:
+      - getea_data:/data
+    ports:
+      - "9002:3000"
+      - "222:22"
+
+  jupyterhub:
+    build: jupyterhub
+    image: jupyterhub_img
+    container_name: jupyterhub
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - jupyterhub_data:/srv/jupyterhub
+    environment:
+      - VIRTUAL_HOST=www.rgsc.top
+      - LETSENCRYPT_HOST=www.rgsc.top
+      - LETSENCRYPT_EMAIL=xuyiqun.xyq@gmail.com
+      - VIRTUAL_PORT=8000
+      - DOCKER_JUPYTER_CONTAINER=jupyterlab_img
+      - DOCKER_NETWORK_NAME=${COMPOSE_PROJECT_NAME}_default
+      - HUB_IP=jupyterhub
+    networks:
+      - "proxy-tier"
+      - "default"
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+    restart:
+      on-failure
+    ports:
+      - "9003:8000"
+
+  jupyterlab:
+    build: jupyterlab
+    image: jupyterlab_img
+    container_name: jupyterlab-throaway
+    networt_mode: none
+    command: echo
+
+
+volumes:
+  certs:
+  vhost.d:
+  html:
+  jupyterhub_data:
+  getea_data:
+
+networks:
+  proxy-tier:
