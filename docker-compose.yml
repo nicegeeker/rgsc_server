@@ -51,7 +51,7 @@ services:
       - LETSENCRYPT_EMAIL=xuyiqun.xyq@gmail.com
       - VIRTUAL_PORT=9000
     volumes:
-      - ./portainer/:/data
+      - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
     ports:
@@ -115,7 +115,7 @@ services:
     build: jupyterlab
     image: jupyterlab_img
     container_name: jupyterlab-throaway
-    networt_mode: none
+    network_mode: none
     command: echo
 
 
@@ -125,6 +125,8 @@ volumes:
   html:
   jupyterhub_data:
   getea_data:
+  portainer_data:
+
 
 networks:
   proxy-tier:

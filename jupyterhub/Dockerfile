@@ -2,7 +2,7 @@ FROM jupyterhub/jupyterhub:1.1
 
 COPY jupyterhub_config.py .
 
-COPY cull_idle_servers.py
+COPY cull_idle_servers.py .
 
 RUN pip install \
     dockerspawner==0.10.0 \
