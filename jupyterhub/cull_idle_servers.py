@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """script to monitor and cull idle single-user servers
 
 Caveats:
