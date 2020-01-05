@@ -197,6 +197,29 @@ services:
     network_mode: none
     command: echo
 
+  RabbitMQ:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+       - "5672:5672"
+       - "15672:15672"
+       - "1883:1883"
+    depends_on:
+       - proxy-letsencrypt
+       - proxy
+    environment:
+      - VIRTUAL_HOST=mq.rgsc.top
+      - LETSENCRYPT_HOST=mq.rgsc.top
+      - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
+      - VIRTUAL_PORT=15672
+    volumes:
+      - ./rabbitMQ/config/:/etc/rabbitmq/
+      - ./rabbitMQ/mnesia/:/var/lib/rabbitmq/mnesia/
+      - ./rabbitMQ/log/:/var/log/rabbitmq/
+    networks:
+      - "proxy-tier"
+      - "default"
 
 volumes:
   certs:
