@@ -59,37 +59,37 @@ services:
 
 
   db-nextcloud:
-     image: mariadb:latest
-     container_name: db-nextcloud
-     networks:
-       - "proxy-tier"
-     volumes:
-       - db-nextcloud:/var/lib/mysql
-       - /etc/localtime:/etc/localtime:ro
-     environment:
-       - MYSQL_ROOT_PASSWORD=Cka4tQKzHvk6Kxc9Qz69
-       - MYSQL_PASSWORD=2g8kRiooy9GKnETgh23R
-       - MYSQL_DATABASE=nextcloud
-       - MYSQL_USER=nextcloud
-     restart: unless-stopped
+    image: mariadb:latest
+    container_name: db-nextcloud
+    networks:
+      - "proxy-tier"
+    volumes:
+      - db-nextcloud:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=Cka4tQKzHvk6Kxc9Qz69
+      - MYSQL_PASSWORD=2g8kRiooy9GKnETgh23R
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    restart: unless-stopped
   
   nextcloud:
-     image: nextcloud:latest
-     container_name: nextcloud
-     networks:
-       - "proxy-tier"
-     depends_on:
-       - proxy-letsencrypt
-       - proxy
-       - db-nextcloud
-     volumes:
-       - nextcloud:/var/www/html
-       - /etc/localtime:/etc/localtime:ro
-     environment:
-       - VIRTUAL_HOST=pan.rgsc.top
-       - LETSENCRYPT_HOST=pan.rgsc.tk
-       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
-     restart: unless-stopped
+    image: nextcloud:latest
+    container_name: nextcloud
+    networks:
+      - "proxy-tier"
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+      - db-nextcloud
+    volumes:
+      - nextcloud:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VIRTUAL_HOST=pan.rgsc.top
+      - LETSENCRYPT_HOST=pan.rgsc.top
+      - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
+    restart: unless-stopped
 
 
   gitea:
@@ -153,7 +153,7 @@ services:
       # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
       - NODE_ENV=production
       - url=https://www.rgsc.top
-      - database__client=mysql
+      - database__client=mariadb
       - database__connection__host=db-ghost
       - database__connection__user=ghost
       - database__connection__password=2g8kRiooy9GKnETgh23R
