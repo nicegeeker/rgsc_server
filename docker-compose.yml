@@ -64,7 +64,7 @@ services:
      networks:
        - "proxy-tier"
      volumes:
-      - db-nextcloud:/var/lib/mysql
+       - db-nextcloud:/var/lib/mysql
        - /etc/localtime:/etc/localtime:ro
      environment:
        - MYSQL_ROOT_PASSWORD=Cka4tQKzHvk6Kxc9Qz69
