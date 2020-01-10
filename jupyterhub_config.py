@@ -10,11 +10,6 @@ c = get_config()
 # avoid having to rebuild the JupyterHub container every time we change a
 # configuration parameter.
 
-## The public facing URL of the whole JupyterHub application.
-#  
-#  This is the address on which the proxy will bind. Sets protocol, ip, base_url
-c.JupyterHub.bind_url = 'https://jupyter.rgsc.top'
-
 
 
 # Spawn single-user servers as Docker containers
