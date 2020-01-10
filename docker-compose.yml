@@ -205,7 +205,7 @@ services:
       - POSTGRES_HOST=hub-db
     networks:
       - "proxy-tier"
-      - "jupyterhub-network"
+      - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
@@ -263,4 +263,6 @@ volumes:
 
 networks:
   proxy-tier:
-  jupyterhub-network:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
