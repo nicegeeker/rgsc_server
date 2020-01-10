@@ -163,7 +163,7 @@ services:
       - VIRTUAL_PORT=2368
 
 
-  hub-db:
+  jupyterhub-db:
     image: postgres:9.5
     container_name: jupyterhub-db
     restart: always
@@ -174,8 +174,6 @@ services:
       - secrets/postgres.env
     volumes:
       - db-hub:${DB_VOLUME_CONTAINER}
-    networks:
-      - "proxy-tier"
       
   jupyterhub:
     build:
@@ -191,29 +189,29 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - jupyterhub:${DATA_VOLUME_CONTAINER}
     links:
-      - hub-db
+      - jupyterhub-db
     environment:
       - VIRTUAL_HOST=jupyter.rgsc.top
       - LETSENCRYPT_HOST=jupyter.rgsc.top
       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
-      - VIRTUAL_PORT=8080
+      - VIRTUAL_PORT=8000
       - DOCKER_NETWORK_NAME=${DOCKER_NETWORK_NAME}
       - DOCKER_NOTEBOOK_IMAGE=${LOCAL_NOTEBOOK_IMAGE}
       - DOCKER_NOTEBOOK_DIR=${DOCKER_NOTEBOOK_DIR}
       - DOCKER_SPAWN_CMD=${DOCKER_SPAWN_CMD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=hub-db
+      - POSTGRES_HOST=jupyterhub-db
     networks:
       - "proxy-tier"
       - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
-      - hub-db
+      - jupyterhub-db
     restart:
       always
     ports:
-      - "9003:8080"
+      - "9003:8000"
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env 
