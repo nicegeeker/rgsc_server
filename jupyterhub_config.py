@@ -10,6 +10,13 @@ c = get_config()
 # avoid having to rebuild the JupyterHub container every time we change a
 # configuration parameter.
 
+## The public facing URL of the whole JupyterHub application.
+#  
+#  This is the address on which the proxy will bind. Sets protocol, ip, base_url
+c.JupyterHub.bind_url = 'https://jupyter.rgsc.top'
+
+
+
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 # Spawn containers from this image
@@ -59,6 +66,9 @@ c.JupyterHub.hub_port = 8080
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 
+
+## Number of days for a login cookie to be valid. Default is two weeks.
+c.JupyterHub.cookie_max_age_days = 14
 c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
     'jupyterhub_cookie_secret')
 
@@ -84,3 +94,23 @@ with open(os.path.join(pwd, 'userlist')) as f:
             whitelist.add(name)
             if len(parts) > 1 and parts[1] == 'admin':
                 admin.add(name)
+
+## Grant admin users permission to access single-user servers.
+#  
+#  Users should be properly informed if this is enabled.
+c.JupyterHub.admin_access = False
+
+## System Resource Limits
+#  If set to 0, no limit is enforced.
+c.JupyterHub.active_server_limit = 30
+
+## Duration (in seconds) to determine the number of active users.
+c.JupyterHub.active_user_window = 1800
+
+## Resolution (in seconds) for updating activity
+#  
+#  If activity is registered that is less than activity_resolution seconds more
+#  recent than the current value, the new value will be ignored.
+#  
+#  This avoids too many writes to the Hub database.
+c.JupyterHub.activity_resolution = 30
