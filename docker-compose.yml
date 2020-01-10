@@ -171,7 +171,7 @@ services:
     env_file:
       - secrets/postgres.env
     volumes:
-      - "db-hub: ${DB_VOLUME_CONTAINER}"
+      - db-hub:${DB_VOLUME_CONTAINER}
       
   jupyterhub:
     build:
@@ -248,8 +248,12 @@ volumes:
   ghost:
   db-nextcloud:
   nextcloud:
-  db-hub:
   jupyterhub:
+    external:
+      name: ${DATA_VOLUME_HOST}
+  db-hub:
+    external:
+      name: ${DB_VOLUME_HOST}
 
 
 networks:
