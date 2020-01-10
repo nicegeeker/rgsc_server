@@ -200,7 +200,6 @@ services:
       - POSTGRES_DB:${POSTGRES_DB}
       - POSTGRES_HOST:hub-db
     networks:
-      - "jupyterhub_network"
       - "proxy-tier"
     depends_on:
       - proxy-letsencrypt
@@ -210,15 +209,11 @@ services:
       always
     ports:
       - "9003:8080"
+    env_file:
+      - secrets/postgres.env
+      - secrets/oauth.env 
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
-
-  jupyterlab:
-    build: jupyterlab
-    image: jupyterlab_img
-    container_name: jupyterlab-throaway
-    network_mode: none
-    command: echo
 
   RabbitMQ:
     image: rabbitmq:3-management
