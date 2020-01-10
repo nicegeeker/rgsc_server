@@ -19,7 +19,6 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      - "default"
       - "proxy-tier"
 
   proxy-letsencrypt:
@@ -35,7 +34,6 @@ services:
     depends_on:
       - "proxy"
     networks:
-      - "default"
       - "proxy-tier"
 
   portainer:
@@ -108,7 +106,6 @@ services:
     restart: unless-stopped
     networks:
       - "proxy-tier"
-      - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
@@ -205,7 +202,6 @@ services:
     networks:
       - "jupyterhub_network"
       - "proxy-tier"
-      - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
@@ -246,7 +242,6 @@ services:
       - ./rabbitMQ/log/:/var/log/rabbitmq/
     networks:
       - "proxy-tier"
-      - "default"
 
 volumes:
   certs:
@@ -264,4 +259,6 @@ volumes:
 
 networks:
   proxy-tier:
-  ${DOCKER_NETWORK_NAME}:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
