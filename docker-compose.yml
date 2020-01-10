@@ -203,6 +203,7 @@ services:
       - POSTGRES_HOST:hub-db
     networks:
       - "proxy-tier"
+      - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
