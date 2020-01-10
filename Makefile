@@ -23,13 +23,13 @@ secrets/oauth.env:
 	@echo "Need oauth.env file in secrets with GitHub parameters"
 	@exit 1
 
-secrets/jupyterhub.crt:
-	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
-	@exit 1
+#secrets/jupyterhub.crt:
+# @echo "Need an SSL certificate in secrets/jupyterhub.crt"
+# @exit 1
 
-secrets/jupyterhub.key:
-	@echo "Need an SSL key in secrets/jupyterhub.key"
-	@exit 1
+# secrets/jupyterhub.key:
+# @echo "Need an SSL key in secrets/jupyterhub.key"
+# @exit 1
 
 userlist:
 	@echo "Add usernames, one per line, to ./userlist, such as:"
@@ -45,7 +45,7 @@ else
 	cert_files=
 endif
 
-check-files: userlist $(cert_files) secrets/oauth.env secrets/postgres.env
+check-files: userlist secrets/oauth.env secrets/postgres.env
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
