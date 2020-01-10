@@ -4,9 +4,8 @@ ARG JUPYTERHUB_VERSION
 FROM jupyterhub/jupyterhub:$JUPYTERHUB_VERSION
 
 # Install dockerspawner, oauth, postgres
-RUN /opt/conda/bin/conda install -yq psycopg2=2.8 && \
-    /opt/conda/bin/conda clean -tipsy && \
-    /opt/conda/bin/pip install --no-cache-dir \
+RUN  pip install --no-cache-dir \
+        psycopg2=2.8 \
         oauthenticator==0.10.0 \
         dockerspawner==0.11.1
 
