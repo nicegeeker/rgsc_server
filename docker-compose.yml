@@ -54,6 +54,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "9000:9000"
+    networks:
+      - "proxy-tier"
 
 
   db-nextcloud:
