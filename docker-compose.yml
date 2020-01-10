@@ -119,7 +119,7 @@ services:
       - "222:22"
 
   db-ghost:
-    image: mysql:latest
+    image: mariadb:latest
     container_name: db-ghost
     networks:
       - "proxy-tier"
@@ -163,32 +163,64 @@ services:
       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
       - VIRTUAL_PORT=2368
 
+
+  hub-db:
+    image: postgres:9.5
+    container_name: jupyterhub-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${DB_VOLUME_CONTAINER}
+    env_file:
+      - secrets/postgres.env
+    volumes:
+      - "db: ${DB_VOLUME_CONTAINER}"
+      
   jupyterhub:
-    build: jupyterhub
-    image: jupyterhub_img
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyterhub
+      args:
+        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
+    image: jupyterhub
     container_name: jupyterhub
+    hostname: jupyterhub
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
-      - jupyterhub:/srv/jupyterhub
+      - jupyterhub: ${DATA_VOLUME_CONTAINER}
+    links:
+      -hub-db
     environment:
       - VIRTUAL_HOST=jupyter.rgsc.top
       - LETSENCRYPT_HOST=jupyter.rgsc.top
       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
       - VIRTUAL_PORT=8000
-      - DOCKER_JUPYTER_CONTAINER=jupyterlab_img
-      - DOCKER_NETWORK_NAME=${COMPOSE_PROJECT_NAME}_default
-      - HUB_IP=jupyterhub
+      - DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
+      - DOCKER_NOTEBOOK_IMAGE: ${LOCAL_NOTEBOOK_IMAGE}
+      - DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
+      - DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
+      - POSTGRES_DB: ${POSTGRES_DB}
+      - POSTGRES_HOST: hub-db
     networks:
+      - "jupyterhub_network"
       - "proxy-tier"
       - "default"
     depends_on:
       - proxy-letsencrypt
       - proxy
+      - hub-db
     restart:
-      on-failure
+      always
     ports:
       - "9003:8000"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    command: >
+      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
   jupyterlab:
     build: jupyterlab
