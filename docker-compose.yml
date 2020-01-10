@@ -174,14 +174,14 @@ services:
     env_file:
       - secrets/postgres.env
     volumes:
-      - "db: ${DB_VOLUME_CONTAINER}"
+      - "db-hub: ${DB_VOLUME_CONTAINER}"
       
   jupyterhub:
     build:
       context: .
       dockerfile: Dockerfile.jupyterhub
       args:
-        JUPYTERHUB_VERSION:${JUPYTERHUB_VERSION}
+        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
     image: jupyterhub
     container_name: jupyterhub
     hostname: jupyterhub
@@ -190,7 +190,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - jupyterhub:${DATA_VOLUME_CONTAINER}
     links:
-      -hub-db
+      - hub-db
     environment:
       - VIRTUAL_HOST=jupyter.rgsc.top
       - LETSENCRYPT_HOST=jupyter.rgsc.top
@@ -258,8 +258,10 @@ volumes:
   ghost:
   db-nextcloud:
   nextcloud:
+  db-hub:
   jupyterhub:
 
 
 networks:
   proxy-tier:
+  ${DOCKER_NETWORK_NAME}:
