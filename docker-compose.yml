@@ -164,7 +164,7 @@ services:
 
 
   jupyterhub-db:
-    image: kartoza/postgis:12.0
+    image: postgres:9.5
     container_name: jupyterhub-db
     restart: always
     environment:

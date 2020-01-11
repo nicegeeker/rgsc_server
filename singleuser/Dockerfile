@@ -4,7 +4,7 @@ ARG JUPYTERHUB_VERSION
 RUN python3 -m pip install --upgrade --no-cache jupyterhub==$JUPYTERHUB_VERSION \
   jupyterlab-git \
   psycopg2-binary \
-  pika \
+  pika 
 RUN jupyter lab build
   
   
