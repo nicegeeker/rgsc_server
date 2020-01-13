@@ -241,6 +241,25 @@ services:
     networks:
       - "proxy-tier"
 
+  postgis-db:
+    image: kartoza/postgis:12.0
+    container_name: postgis-db
+    restart: always
+    environment:
+      ALLOW_IP_RANGE: 0.0.0.0/0
+      POSTGRES_USER: nicegeek
+      POSTGRES_DBNAME: research, test
+    env_file:
+      - secrets/postgis.env
+    volumes:
+      - db-postgis:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - "proxy-tier"
+
+
+
 volumes:
   certs:
   vhost.d:
@@ -257,6 +276,7 @@ volumes:
   db-hub:
     external:
       name: ${DB_VOLUME_HOST}
+  db-postgis:
 
 
 networks:
