@@ -5,7 +5,7 @@ RUN python3 -m pip install --upgrade --no-cache jupyterhub==$JUPYTERHUB_VERSION 
   jupyterlab-git \
   psycopg2-binary \
   pystan \
-  jupyter-stan \
+  jupyterstan \
   shapely \
   arviz \
   pika 
