@@ -2,10 +2,11 @@ FROM jupyterlab-user:base
 RUN conda install pystan \
                   shapely \
                   arviz  \
-                  sycopg2 \
+                  psycopg2 \
   && conda clean -afy
 RUN pip install --no-cache \
   jupyterstan \
   pika
+RUN julia -e 'using Pkg; Pkg.add(["GaussianRandomFields","PyPlot","ArchGDAL","PostgreSQL","DataFrames","Query","CSV"])'
   
   
