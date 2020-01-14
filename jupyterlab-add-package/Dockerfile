@@ -7,6 +7,6 @@ RUN conda install pystan \
 RUN pip install --no-cache \
   jupyterstan \
   pika
-RUN julia -e 'using Pkg; Pkg.add(["GaussianRandomFields","PyPlot","ArchGDAL","PostgreSQL","DataFrames","Query","CSV"])'
+RUN julia -e 'using Pkg; Pkg.add(["GaussianRandomFields","PyPlot","ArchGDAL","LibPQ","DataFrames","Query","CSV"])'
   
   
