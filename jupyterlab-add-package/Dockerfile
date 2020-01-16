@@ -3,6 +3,7 @@ RUN julia -e 'using Pkg; Pkg.add(["GaussianRandomFields","PyPlot","ArchGDAL","Li
 RUN pip install --no-cache \
   jupyterstan \
   pika
+RUN conda config --set channel_priority strict
 RUN conda install -c conda-forge jupyter_contrib_nbextensions \
 &&  conda install -c conda-forge jupyter_nbextensions_configurator 
 RUN conda install -c conda-forge pystan \
