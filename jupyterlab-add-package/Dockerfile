@@ -13,5 +13,8 @@ RUN conda install -c conda-forge pystan \
   &&  conda install -c conda-forge geopandas \
   &&  conda install -c conda-forge rasterio \
   &&  conda clean -afy
-  
-  
+
+RUN julia -e 'using Pkg; Pkg.add(["NetCDF"])'
+RUN julia -e 'using Pkg; Pkg.update'
+RUN conda update -n base conda
+RUN conda update --all &&  conda clean -afy
