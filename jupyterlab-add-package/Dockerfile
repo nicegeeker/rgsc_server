@@ -8,11 +8,7 @@ RUN conda install -c conda-forge jupyter_contrib_nbextensions \
 RUN conda install -c conda-forge pystan \
   &&  conda install -c conda-forge shapely \
   &&  conda install -c conda-forge arviz  \
-  &&  conda install -c conda-forge psycopg2 \
-  &&  conda install -c conda-forge gdal \
-  &&  conda install -c conda-forge geopandas \
-  &&  conda install -c conda-forge rasterio \
-  &&  conda clean -afy
+  &&  conda install -c conda-forge psycopg2
 
 RUN julia -e 'using Pkg; Pkg.add(["NetCDF"])'
 RUN julia -e 'using Pkg; Pkg.update'
