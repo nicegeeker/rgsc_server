@@ -166,7 +166,7 @@ services:
       - mail__options__host=smtp.qq.com
       - mail__options__port=465
       - mail__options__auth__user=yi-qun.xu@foxmail.com
-      - mail__options__auth__pass=advxuvczpkmjbhgd
+      - mail__options__auth__pass=fjsauenwacgqbhbc
 
 
   jupyterhub-db:
