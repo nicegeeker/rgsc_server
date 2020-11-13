@@ -161,13 +161,13 @@ services:
       - LETSENCRYPT_HOST=www.rgsc.top
       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
       - VIRTUAL_PORT=2368
-      - mail__transport=SMTP
-      - mail__host=smtp.qq.com
-      - mail__fromaddress=yi-qun.xu@foxmail.com
-      - mail__options__service=QQ
+      - mail__transport='SMTP'
+      - mail__host='smtp.qq.com'
+      - mail__fromaddress='yi-qun.xu@foxmail.com'
+      - mail__options__service='QQ'
       - mail__options__port=465
-      - mail__options__auth__user=yi-qun.xu@foxmail.com
-      - mail__options__auth__pass=fjsauenwacgqbhbc
+      - mail__options__auth__user='yi-qun.xu@foxmail.com'
+      - mail__options__auth__pass='fjsauenwacgqbhbc'
 
 
   jupyterhub-db:
