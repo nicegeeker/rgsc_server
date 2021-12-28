@@ -1,7 +1,6 @@
-version: '2'
+version: "2"
 
 services:
-
   proxy:
     image: jwilder/nginx-proxy
     container_name: proxy
@@ -57,7 +56,6 @@ services:
     networks:
       - "proxy-tier"
 
-
   db-nextcloud:
     image: mariadb:latest
     container_name: db-nextcloud
@@ -72,7 +70,7 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     restart: unless-stopped
-  
+
   nextcloud:
     image: nextcloud:latest
     container_name: nextcloud
@@ -90,7 +88,6 @@ services:
       - LETSENCRYPT_HOST=pan.rgsc.top
       - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
     restart: unless-stopped
-
 
   gitea:
     image: gitea/gitea:latest
@@ -117,6 +114,28 @@ services:
       - "9002:3000"
       - "222:22"
 
+  code-server:
+    image: ghcr.io/linuxserver/code-server
+    container_name: code-server
+    environment:
+      - VIRTUAL_HOST=code.rgsc.top
+      - LETSENCRYPT_HOST=code.rgsc.top
+      - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
+      - USER_UID=1000
+      - USER_GID=1000
+      - VIRTUAL_PORT=8443
+      - TZ=Asia/Shanghai
+      - PROXY_DOMAIN=code.rgsc.top
+    restart: unless-stopped
+    networks:
+      - "proxy-tier"
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+    volumes:
+      - ./code-server/config:/config
+
+      
   db-ghost:
     image: mariadb:latest
     container_name: db-ghost
@@ -131,7 +150,6 @@ services:
       - MYSQL_DATABASE=ghost
       - MYSQL_USER=ghost
     restart: unless-stopped
-
 
   ghost:
     image: ghost:3
@@ -169,73 +187,71 @@ services:
       - mail__options__auth__user=yi-qun.xu@foxmail.com
       - mail__options__auth__pass=fjsauenwacgqbhbc
 
+  # jupyterhub-db:
+  #   image: postgres:9.5
+  #   container_name: jupyterhub-db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     PGDATA: ${DB_VOLUME_CONTAINER}
+  #   env_file:
+  #     - secrets/postgres.env
+  #   volumes:
+  #     - db-hub:${DB_VOLUME_CONTAINER}
 
-  jupyterhub-db:
-    image: postgres:9.5
-    container_name: jupyterhub-db
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: ${DB_VOLUME_CONTAINER}
-    env_file:
-      - secrets/postgres.env
-    volumes:
-      - db-hub:${DB_VOLUME_CONTAINER}
-      
-  jupyterhub:
-    build:
-      context: .
-      dockerfile: Dockerfile.jupyterhub
-      args:
-        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
-    image: jupyterhub
-    container_name: jupyterhub
-    hostname: jupyterhub
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
-      - jupyterhub:${DATA_VOLUME_CONTAINER}
-    links:
-      - jupyterhub-db
-    environment:
-      - VIRTUAL_HOST=jupyter.rgsc.top
-      - LETSENCRYPT_HOST=jupyter.rgsc.top
-      - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
-      - VIRTUAL_PORT=8000
-      - DOCKER_NETWORK_NAME=${DOCKER_NETWORK_NAME}
-      - DOCKER_NOTEBOOK_IMAGE=${LOCAL_NOTEBOOK_IMAGE}
-      - DOCKER_NOTEBOOK_DIR=${DOCKER_NOTEBOOK_DIR}
-      - DOCKER_SPAWN_CMD=${DOCKER_SPAWN_CMD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=jupyterhub-db
-    networks:
-      - "proxy-tier"
-      - "default"
-    depends_on:
-      - proxy-letsencrypt
-      - proxy
-      - jupyterhub-db
-    restart:
-      always
-    ports:
-      - "9003:8000"
-    env_file:
-      - secrets/postgres.env
-      - secrets/oauth.env 
-    command: >
-      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+  # jupyterhub:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.jupyterhub
+  #     args:
+  #       JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
+  #   image: jupyterhub
+  #   container_name: jupyterhub
+  #   hostname: jupyterhub
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - jupyterhub:${DATA_VOLUME_CONTAINER}
+  #   links:
+  #     - jupyterhub-db
+  #   environment:
+  #     - VIRTUAL_HOST=jupyter.rgsc.top
+  #     - LETSENCRYPT_HOST=jupyter.rgsc.top
+  #     - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
+  #     - VIRTUAL_PORT=8000
+  #     - DOCKER_NETWORK_NAME=${DOCKER_NETWORK_NAME}
+  #     - DOCKER_NOTEBOOK_IMAGE=${LOCAL_NOTEBOOK_IMAGE}
+  #     - DOCKER_NOTEBOOK_DIR=${DOCKER_NOTEBOOK_DIR}
+  #     - DOCKER_SPAWN_CMD=${DOCKER_SPAWN_CMD}
+  #     - POSTGRES_DB=${POSTGRES_DB}
+  #     - POSTGRES_HOST=jupyterhub-db
+  #   networks:
+  #     - "proxy-tier"
+  #     - "default"
+  #   depends_on:
+  #     - proxy-letsencrypt
+  #     - proxy
+  #     - jupyterhub-db
+  #   restart: always
+  #   ports:
+  #     - "9003:8000"
+  #   env_file:
+  #     - secrets/postgres.env
+  #     - secrets/oauth.env
+  #   command: >
+  #     jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
   RabbitMQ:
     image: rabbitmq:3-management
     container_name: rabbitmq
     restart: unless-stopped
     ports:
-       - "5672:5672"
-       - "15672:15672"
-       - "1883:1883"
+      - "5672:5672"
+      - "15672:15672"
+      - "1883:1883"
     depends_on:
-       - proxy-letsencrypt
-       - proxy
+      - proxy-letsencrypt
+      - proxy
     environment:
       - VIRTUAL_HOST=mq.rgsc.top
       - LETSENCRYPT_HOST=mq.rgsc.top
@@ -256,6 +272,7 @@ services:
       ALLOW_IP_RANGE: 0.0.0.0/0
       POSTGRES_USER: nicegeek
       POSTGRES_DBNAME: research, test
+      POSTGRES_PASSWORD: iloveting1314
     env_file:
       - secrets/postgis.env
     volumes:
@@ -265,7 +282,20 @@ services:
     networks:
       - "proxy-tier"
 
-
+  syncthing_discov:
+    image: syncthing/discosrv
+    container_name: discover
+    networks:
+      - "proxy-tier"
+    depends_on:
+      - proxy-letsencrypt
+      - proxy
+    environment:
+      - VIRTUAL_HOST=discover.rgsc.top
+      - LETSENCRYPT_HOST=discover.rgsc.top
+      - LETSENCRYPT_EMAIL=yi-qun.xu@foxmail.com
+      - VIRTUAL_PORT=8443
+    restart: unless-stopped
 
 volumes:
   certs:
@@ -277,17 +307,16 @@ volumes:
   ghost:
   db-nextcloud:
   nextcloud:
-  jupyterhub:
-    external:
-      name: ${DATA_VOLUME_HOST}
-  db-hub:
-    external:
-      name: ${DB_VOLUME_HOST}
+  # jupyterhub:
+  #   external:
+  #     name: ${DATA_VOLUME_HOST}
+  # db-hub:
+  #   external:
+  #     name: ${DB_VOLUME_HOST}
   db-postgis:
-
 
 networks:
   proxy-tier:
-  default:
-    external:
-      name: ${DOCKER_NETWORK_NAME}
+  # default:
+  #   external:
+  #     name: ${DOCKER_NETWORK_NAME}
